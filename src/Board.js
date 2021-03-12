@@ -18,7 +18,8 @@ export default class Board extends React.Component {
             board: bo,
             selectedId: null,
             whiteTurn: true,
-            overMessage : ""
+            overMessage : "",
+            gameOver : false
         }
 
 
@@ -27,9 +28,22 @@ export default class Board extends React.Component {
     componentDidMount() {
         this.setState((state) => {
             state.currMoves = this.calcValidMoves();
+            if(this.props.playerColor === "black"){
+                this.pickRandomMove(state)
+            }
             return state
         });
 
+    }
+
+
+    pickRandomMove(state){
+        let randomMove =  state.currMoves[Math.floor(Math.random() * state.currMoves.length)]
+        this.makeMove(state,randomMove.attacker,randomMove.target)
+        state.currMoves = this.calcValidMoves()
+        if(state.currMoves.length == 0) {
+            this.endGame()
+        }
     }
 
     rookMove(state, id) {
@@ -239,12 +253,24 @@ export default class Board extends React.Component {
 
     }
 
-    makeMove(state,id){
-        const attacker = state.board[state.selectedId]
-        state.board[id].piece = attacker.piece
-        state.board[id].isWhite = attacker.isWhite
-        state.board[state.selectedId].piece = "E"
-        state.selectedId = null
+    endGame(){
+        let moves = this.calcValidMoves()
+        let inCheck = this.isKingInCheck(moves)
+        this.state.gameOver = true
+        if (inCheck == true) {
+            let winner = this.state.whiteTurn == true ? "White" : "Black"
+            this.state.overMessage ="Game over : " + winner + " wins by checkmate"
+        } else {
+            this.state.overMessage = "Game over : draw by stalemate"
+        }
+    }
+
+    makeMove(state,attackerId,targetId){
+        const attacker = state.board[attackerId]
+        state.board[targetId].piece = attacker.piece
+        state.board[targetId].isWhite = attacker.isWhite
+        state.board[attackerId].piece = "E"
+        attackerId = null
         state.board.forEach(square => square.highlighted = false)
         state.whiteTurn = !state.whiteTurn
     }
@@ -252,18 +278,14 @@ export default class Board extends React.Component {
     handleClick(id) {
         if (this.state.board[id].highlighted == true) {
             this.setState((state) => {
-                this.makeMove(state,id)
+                this.makeMove(state,this.state.selectedId,id)
                 state.currMoves = this.calcValidMoves()
                 if (state.currMoves.length === 0) {
                     state.whiteTurn = !state.whiteTurn
-                    let moves = this.calcValidMoves()
-                    let inCheck = this.isKingInCheck(moves)
-                    if (inCheck == true) {
-                        let winner = this.state.whiteTurn == true ? "White" : "Black"
-                        this.state.overMessage ="Game over : " + winner + " wins by checkmate"
-                    } else {
-                        this.state.overMessage = "Game over : draw by stalemate"
-                    }
+                    this.endGame()
+                }
+                if(!this.state.gameOver) {
+                    this.pickRandomMove(state)
                 }
                 return state
 
