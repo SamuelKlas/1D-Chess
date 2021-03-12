@@ -108,13 +108,14 @@ export default class Board extends React.Component {
         const attacker = copyState.board[attackerId]
         let kingId = null
 
-
         copyState.board[targetId].piece = attacker.piece
         copyState.board[targetId].isWhite = attacker.isWhite
         copyState.board[attackerId].piece = "E"
+
         for (let i = 0; i < 8; i++) {
             if (copyState.board[i].piece === "K" && copyState.board[i].isWhite === copyState.whiteTurn) kingId = i
         }
+
 
         for (let i = 0; i < 8; i++) {
             let ids = []
@@ -238,16 +239,20 @@ export default class Board extends React.Component {
 
     }
 
+    makeMove(state,id){
+        const attacker = state.board[state.selectedId]
+        state.board[id].piece = attacker.piece
+        state.board[id].isWhite = attacker.isWhite
+        state.board[state.selectedId].piece = "E"
+        state.selectedId = null
+        state.board.forEach(square => square.highlighted = false)
+        state.whiteTurn = !state.whiteTurn
+    }
+
     handleClick(id) {
         if (this.state.board[id].highlighted == true) {
-            const attacker = this.state.board[this.state.selectedId]
             this.setState((state) => {
-                state.board[id].piece = attacker.piece
-                state.board[id].isWhite = attacker.isWhite
-                state.board[this.state.selectedId].piece = "E"
-                state.selectedId = null
-                state.board.forEach(square => square.highlighted = false)
-                state.whiteTurn = !state.whiteTurn
+                this.makeMove(state,id)
                 state.currMoves = this.calcValidMoves()
                 if (state.currMoves.length === 0) {
                     state.whiteTurn = !state.whiteTurn
@@ -279,7 +284,11 @@ export default class Board extends React.Component {
     }
 
     getColor(id) {
-
+        const rgb = id % 2 == 0 ? {r : 125, g : 135,b : 150} : {r : 232, g : 235,b : 239}
+        if(this.state.board[id].highlighted){
+            rgb.g = rgb.g + 70
+        }
+        return `rgb(${rgb.r},${rgb.g},${rgb.b})`
     }
 
     render() {
@@ -288,14 +297,13 @@ export default class Board extends React.Component {
         (d => <button type="button"
                       id={d.id}
                       style={{
-                          width: "100px",
-                          height: "100px",
-                          backgroundColor: d.id % 2 == 0 ? `rgb(125,${!this.state.board[d.id].highlighted ? 135 : 205},150)` : `rgb(232,${!this.state.board[d.id].highlighted ? 235 : 305},239)`,
+                          width: "100px", height: "100px",
+                          backgroundColor: this.getColor(d.id),
                           border: "none",
                           backgroundImage: `url("http://localhost:3000/${this.mapping(d.id)}.png")`,
                           backgroundRepeat: "no-repeat",
                           backgroundSize: "100%"
-                      }}
+                        }}
 
                       onClick={e => this.handleClick(e.target.id)}>
 
@@ -303,7 +311,7 @@ export default class Board extends React.Component {
         )
         return <div>
             {squares}
-            <p>{this.state.overMessage}</p>
+            <p><b>{this.state.overMessage}</b></p>
         </div>
     }
 
