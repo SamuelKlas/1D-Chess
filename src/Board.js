@@ -37,15 +37,6 @@ export default class Board extends React.Component {
     }
 
 
-    pickRandomMove(state){
-        let randomMove =  state.currMoves[Math.floor(Math.random() * state.currMoves.length)]
-        this.makeMove(state,randomMove.attacker,randomMove.target)
-        state.currMoves = this.calcValidMoves()
-        if(state.currMoves.length == 0) {
-            this.endGame()
-        }
-    }
-
     rookMove(state, id) {
         const ids = []
         ids.push(id)
@@ -251,6 +242,16 @@ export default class Board extends React.Component {
         }
         return moves.some(move => move.target == kingId)
 
+    }
+
+    pickRandomMove(state){
+        let randomMove =  state.currMoves[Math.floor(Math.random() * state.currMoves.length)]
+        this.makeMove(state,randomMove.attacker,randomMove.target)
+        state.currMoves = this.calcValidMoves()
+        if(state.currMoves.length == 0) {
+            this.state.whiteTurn = !this.state.whiteTurn
+            this.endGame()
+        }
     }
 
     endGame(){

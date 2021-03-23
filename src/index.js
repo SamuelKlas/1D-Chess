@@ -5,7 +5,7 @@ import Board from "./Board.js"
 
 ReactDOM.render(
     <div>
-        <Board playerColor = "white"/>
+        <Board playerColor = "black"/>
     </div>,
     document.getElementById('root')
 );
