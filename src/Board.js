@@ -3,7 +3,7 @@ import React from 'react';
 export default class Board extends React.Component {
     constructor(props) {
         super(props);
-        const b = ["K", "KN", "R", "E", "E", "R", "KN", "K"]
+        const b = this.props.board
         const bo = b.map(d => ({piece: d, highlighted: false, id: 0}))
         for (let i = 0; i < 8; i++) {
             bo[i].id = i;
@@ -13,20 +13,32 @@ export default class Board extends React.Component {
         this.handleClick = this.handleClick.bind(this);
         this.highlightSquares = this.highlightSquares.bind(this);
         this.calcAllMoves = this.calcAllMoves.bind(this);
+        this.handleResetClick = this.handleResetClick.bind(this)
 
         this.state = {
             board: bo,
             selectedId: null,
             whiteTurn: true,
             overMessage : "",
-            gameOver : false
+            gameOver : false,
+
         }
 
 
     }
 
+    handleResetClick(){
+        this.setState((state) => {
+            state = state.initialState
+            state.currMoves = this.calcValidMoves();
+            return state
+
+        });
+    }
+
     componentDidMount() {
         this.setState((state) => {
+            state.initialState = JSON.parse(JSON.stringify(state))
             state.currMoves = this.calcValidMoves();
             if(this.props.playerColor === "black"){
                 this.pickRandomMove(state)
