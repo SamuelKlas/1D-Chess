@@ -304,7 +304,13 @@ export default class Board extends React.Component {
                     this.endGame()
                 }
                 if(!this.state.gameOver) {
-                    this.pickRandomMove(state)
+                    this.state.clickable = false
+                    setTimeout(() => {
+                        this.setState((state) => {
+                            this.pickRandomMove(state)
+                            state.clickable = true
+                            return state
+                        }); }, 500);
                 }
                 return state
 
