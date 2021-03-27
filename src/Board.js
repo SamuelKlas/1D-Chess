@@ -19,8 +19,9 @@ export default class Board extends React.Component {
             board: bo,
             selectedId: null,
             whiteTurn: true,
-            overMessage : "",
+            overMessage : this.props.playerColor === "" ? "Pick your color" : "You are playing as the " + this.props.playerColor + " pieces",
             gameOver : false,
+            clickable : false
 
         }
 
@@ -29,22 +30,26 @@ export default class Board extends React.Component {
 
     handleResetClick(){
         this.setState((state) => {
-            state = state.initialState
             state.currMoves = this.calcValidMoves();
             return state
 
         });
     }
 
+
     componentDidMount() {
-        this.setState((state) => {
-            state.initialState = JSON.parse(JSON.stringify(state))
-            state.currMoves = this.calcValidMoves();
-            if(this.props.playerColor === "black"){
-                this.pickRandomMove(state)
-            }
-            return state
-        });
+        setTimeout(() => {
+            this.setState((state) => {
+                state.clickable = true
+                state.currMoves = this.calcValidMoves();
+                console.log(this.props.playerColor)
+                if(this.props.playerColor === "black"){
+                    this.pickRandomMove(state)
+                }
+                return state
+            }); }, 500);
+
+
 
     }
 
@@ -289,6 +294,7 @@ export default class Board extends React.Component {
     }
 
     handleClick(id) {
+        if(this.props.playerColor === "" || this.state.clickable === false)return
         if (this.state.board[id].highlighted == true) {
             this.setState((state) => {
                 this.makeMove(state,this.state.selectedId,id)

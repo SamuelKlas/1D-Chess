@@ -12,12 +12,12 @@ export default class GameArea extends React.Component {
             playerColor : ""
         }
         this.handleResetClick = this.handleResetClick.bind(this)
-        this.handleBackToSelectClick = this.handleBackToSelectClick.bind(this)
     }
 
     callbackFunction = (childData) => {
         this.setState((state) => {
             state.playerColor = childData
+            state.counter +=1
             return state
         });
     }
@@ -29,25 +29,13 @@ export default class GameArea extends React.Component {
         });
     }
 
-    handleBackToSelectClick(){
-        this.setState((state) => {
-            state.playerColor = ""
-            return state
-        });
-    }
-
-
-
     render(){
-
-
-        const selection = <ChooseColorArea callBack = {this.callbackFunction} />
-        const game = <div>
+        const game = <div className="gamearea">
             <button onClick={this.handleResetClick}>Reset</button>
             <Board key = {this.state.counter} board = {this.state.board} playerColor = {this.state.playerColor} />
-            <button onClick={this.handleBackToSelectClick}>Back to selection</button>
+            <ChooseColorArea callBack = {this.callbackFunction} />
         </div>
-        return this.state.playerColor === "" ? selection : game
+        return game
     }
 
 

@@ -7,7 +7,6 @@ export default class ChooseColorArea extends React.Component {
         this.state = {
             color : ""
         }
-        this.sendData = this.sendData.bind(this)
         this.handleClickBlack = this.handleClickBlack.bind(this)
         this.handleClickWhite = this.handleClickWhite.bind(this)
 
@@ -15,20 +14,20 @@ export default class ChooseColorArea extends React.Component {
 
     }
     handleClickWhite() {
-        this.setState( {
-            color : "white"
-        })
+        this.setState((state) => {
+            state.color = "white"
+            this.props.callBack(state.color);
+            return state
+        });
     }
     handleClickBlack() {
-        this.setState( {
-            color : "black"
-        })
-    }
+        this.setState((state) => {
+            state.color = "black"
+            this.props.callBack(state.color);
+            return state
+        });
 
-    sendData() {
-        this.props.callBack(this.state.color);
     }
-
     getButtonStyle(color){
         return {
             width: "100px", height: "100px",
@@ -40,6 +39,11 @@ export default class ChooseColorArea extends React.Component {
         }
     }
 
+    componentWillUnmount(){
+        this.props.callBack(this.state.color);
+
+    }
+
 
 
 
@@ -47,11 +51,9 @@ export default class ChooseColorArea extends React.Component {
     render(){
 
 
-        return <div>
-            <p>Choose your side</p>
+        return <div className="colorarea">
             <button style = {this.getButtonStyle("white")} onClick={this.handleClickWhite}></button>
             <button style = {this.getButtonStyle("black")} onClick={this.handleClickBlack}></button>
-            <button onClick={this.sendData}>Ok</button>
             </ div>
     }
 
